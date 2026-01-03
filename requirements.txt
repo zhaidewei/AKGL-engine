@@ -1,0 +1,7 @@
+requests>=2.31.0
+python-dotenv>=1.0.0
+pre-commit>=3.5.0
+flask>=3.0.0
+pyyaml>=6.0
+markdown>=3.5.0
+pygments>=2.16.0

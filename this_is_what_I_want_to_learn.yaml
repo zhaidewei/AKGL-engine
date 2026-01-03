@@ -1,0 +1,397 @@
+learning_path:
+  title: "Flink快速上手指南 - 币安WebSocket交易数据实时处理"
+  description: "从零到一：掌握Flink核心概念和实际应用，实现币安WebSocket交易数据的实时读取与处理"
+  target_scenario: "币安Binance WebSocket交易数据实时读取"
+
+  modules:
+    # ========== 第一部分：Flink基础概念 ==========
+    - id: flink_001
+      title: "DataStream：Flink中的流数据抽象"
+      type: concept
+      description: "理解DataStream是什么，它如何表示无界数据流"
+
+    - id: flink_002
+      title: "DataStream的不可变性：为什么每次转换都产生新流"
+      type: concept
+      description: "理解DataStream的不可变性，每次转换都产生新的DataStream对象"
+
+    - id: flink_003
+      title: "转换链：理解DataStream的链式调用"
+      type: concept
+      description: "理解如何通过链式调用构建数据处理管道"
+
+    - id: flink_004
+      title: "StreamExecutionEnvironment：作业的入口点"
+      type: concept
+      description: "理解StreamExecutionEnvironment是什么，它是Flink作业的起点"
+
+    - id: flink_005
+      title: "创建StreamExecutionEnvironment：三种方式"
+      type: mechanism
+      description: "理解getExecutionEnvironment()、createLocalEnvironment()、createRemoteEnvironment()的区别"
+
+    - id: flink_006
+      title: "本地执行环境：开发和测试"
+      type: concept
+      description: "理解本地执行环境的作用，何时使用它进行开发和测试"
+
+    - id: flink_007
+      title: "集群执行环境：生产部署"
+      type: concept
+      description: "理解集群执行环境，如何连接到Flink集群"
+
+    - id: flink_008
+      title: "execute()：触发作业执行的关键"
+      type: mechanism
+      description: "理解为什么需要显式调用execute()才能启动Flink作业，懒加载机制"
+
+    # ========== 第二部分：数据源（Source） ==========
+    - id: flink_009
+      title: "SourceFunction接口：自定义数据源的基础"
+      type: mechanism
+      description: "理解SourceFunction接口的定义，它是所有自定义数据源的基类"
+
+    - id: flink_010
+      title: "SourceFunction的run()方法：数据生成的核心"
+      type: mechanism
+      description: "理解run()方法的作用，它是数据生成的主要逻辑所在"
+
+    - id: flink_011
+      title: "SourceFunction的cancel()方法：优雅停止"
+      type: mechanism
+      description: "理解cancel()方法的作用，如何实现优雅停止数据源"
+
+    - id: flink_012
+      title: "SourceContext：数据发送的上下文对象"
+      type: concept
+      description: "理解SourceContext是什么，它提供了哪些方法"
+
+    - id: flink_013
+      title: "SourceContext.collect()：发送数据到流中"
+      type: mechanism
+      description: "理解如何使用collect()方法将数据发送到Flink流中"
+
+    - id: flink_014
+      title: "SourceContext.collectWithTimestamp()：带时间戳的数据"
+      type: mechanism
+      description: "理解如何发送带时间戳的数据，用于事件时间处理"
+
+    - id: flink_015
+      title: "WebSocket客户端库选择：OkHttp vs Java-WebSocket"
+      type: practice
+      description: "理解如何选择WebSocket客户端库，推荐使用OkHttp或Java-WebSocket"
+
+    - id: flink_016
+      title: "币安WebSocket API：理解连接URL和订阅格式"
+      type: practice
+      description: "理解币安WebSocket API的URL格式，如何订阅trade stream和ticker stream"
+
+    - id: flink_017
+      title: "建立WebSocket连接：在SourceFunction中初始化"
+      type: practice
+      description: "在SourceFunction的构造函数或open()方法中建立WebSocket连接"
+
+    - id: flink_018
+      title: "WebSocket消息监听：接收币安数据"
+      type: practice
+      description: "实现WebSocket消息监听器，接收币安推送的交易数据"
+
+    - id: flink_019
+      title: "JSON解析：将币安消息转换为Java对象"
+      type: practice
+      description: "使用Jackson或Gson解析币安WebSocket返回的JSON消息"
+
+    - id: flink_020
+      title: "emit数据到Flink流：连接WebSocket和DataStream"
+      type: practice
+      description: "将解析后的币安交易数据通过SourceContext.emit()发送到Flink流中"
+
+    - id: flink_021
+      title: "WebSocket连接异常处理：捕获和记录错误"
+      type: practice
+      description: "实现WebSocket的onError回调，捕获连接异常并记录日志"
+
+    - id: flink_022
+      title: "WebSocket自动重连：实现重连逻辑"
+      type: practice
+      description: "实现WebSocket断线后的自动重连机制，确保数据不中断"
+
+    - id: flink_023
+      title: "重连间隔策略：指数退避算法"
+      type: practice
+      description: "实现重连间隔的指数退避，避免频繁重连对服务器造成压力"
+
+    # ========== 第三部分：数据转换操作 ==========
+    - id: flink_024
+      title: "map()：一对一元素转换"
+      type: mechanism
+      description: "理解map()操作，将每个元素转换为另一个元素，类型可以改变"
+
+    - id: flink_025
+      title: "MapFunction接口：实现map转换逻辑"
+      type: mechanism
+      description: "理解如何实现MapFunction接口，编写map转换的具体逻辑"
+
+    - id: flink_026
+      title: "filter()：根据条件过滤数据"
+      type: mechanism
+      description: "理解filter()操作，根据条件决定是否保留数据流中的元素"
+
+    - id: flink_027
+      title: "FilterFunction接口：实现过滤逻辑"
+      type: mechanism
+      description: "理解如何实现FilterFunction接口，编写过滤条件"
+
+    - id: flink_028
+      title: "flatMap()：一对多元素转换"
+      type: mechanism
+      description: "理解flatMap()操作，将一个元素转换为零个或多个元素"
+
+    - id: flink_029
+      title: "FlatMapFunction接口：实现一对多转换"
+      type: mechanism
+      description: "理解如何实现FlatMapFunction接口，使用Collector输出多个元素"
+
+    - id: flink_030
+      title: "keyBy()：按key分组数据流"
+      type: mechanism
+      description: "理解keyBy()操作，如何选择key和分组逻辑"
+
+    - id: flink_031
+      title: "KeySelector：定义key提取逻辑"
+      type: mechanism
+      description: "理解如何实现KeySelector接口，从数据中提取key"
+
+    - id: flink_032
+      title: "KeyedStream：分组后的流类型"
+      type: concept
+      description: "理解KeyedStream的特性，为什么分组后才能使用状态和窗口"
+
+    - id: flink_033
+      title: "KeyedStream的状态隔离：每个key独立状态"
+      type: concept
+      description: "理解KeyedStream中每个key的状态是隔离的，互不影响"
+
+    # ========== 第四部分：时间与Watermark ==========
+    - id: flink_034
+      title: "处理时间（Processing Time）：系统时间"
+      type: concept
+      description: "理解处理时间的概念，它是Flink处理数据的系统时间"
+
+    - id: flink_035
+      title: "事件时间（Event Time）：数据产生的时间"
+      type: concept
+      description: "理解事件时间的概念，它是数据本身携带的时间戳"
+
+    - id: flink_036
+      title: "摄入时间（Ingestion Time）：数据进入Flink的时间"
+      type: concept
+      description: "理解摄入时间的概念，它是数据进入Flink系统的时间"
+
+    - id: flink_037
+      title: "何时使用事件时间：处理乱序数据的场景"
+      type: concept
+      description: "理解为什么在处理乱序数据（如币安交易数据）时需要使用事件时间"
+
+    - id: flink_038
+      title: "Watermark：事件时间的进度指标"
+      type: concept
+      description: "理解Watermark是什么，它如何表示事件时间的进度"
+
+    - id: flink_039
+      title: "Watermark的作用：告诉系统时间进度"
+      type: concept
+      description: "理解Watermark如何告诉Flink系统，某个时间点之前的数据应该已经到达"
+
+    - id: flink_040
+      title: "周期性Watermark生成：定时生成策略"
+      type: mechanism
+      description: "理解周期性Watermark生成，每隔一段时间生成一次Watermark"
+
+    - id: flink_041
+      title: "标点式Watermark生成：基于数据生成"
+      type: mechanism
+      description: "理解标点式Watermark生成，基于特定数据事件生成Watermark"
+
+    - id: flink_042
+      title: "assignTimestampsAndWatermarks()：设置时间特性"
+      type: mechanism
+      description: "理解如何为DataStream分配时间戳和生成Watermark"
+
+    - id: flink_043
+      title: "TimestampAssigner：提取事件时间戳"
+      type: mechanism
+      description: "理解如何实现TimestampAssigner，从数据中提取时间戳"
+
+    - id: flink_044
+      title: "WatermarkGenerator：生成Watermark"
+      type: mechanism
+      description: "理解如何实现WatermarkGenerator接口，生成Watermark"
+
+    - id: flink_045
+      title: "BoundedOutOfOrdernessWatermarks：处理乱序数据"
+      type: mechanism
+      description: "理解如何设置最大乱序时间，处理延迟到达的数据"
+
+    - id: flink_046
+      title: "设置最大延迟时间：平衡延迟和准确性"
+      type: practice
+      description: "理解如何为币安交易数据设置合适的最大延迟时间"
+
+    # ========== 第五部分：窗口操作 ==========
+    - id: flink_047
+      title: "窗口的概念：为什么需要窗口"
+      type: concept
+      description: "理解窗口的作用，何时需要对无界流进行窗口化处理"
+
+    - id: flink_048
+      title: "滚动窗口（TumblingWindow）：固定大小不重叠"
+      type: mechanism
+      description: "理解滚动窗口的特点，如何创建固定大小的滚动窗口"
+
+    - id: flink_049
+      title: "滑动窗口（SlidingWindow）：固定大小可重叠"
+      type: mechanism
+      description: "理解滑动窗口的特点，如何创建可重叠的滑动窗口"
+
+    - id: flink_050
+      title: "会话窗口（SessionWindow）：基于活动间隔"
+      type: mechanism
+      description: "理解会话窗口的特点，基于数据活动间隔动态创建窗口"
+
+    - id: flink_051
+      title: "窗口函数reduce()：增量聚合"
+      type: mechanism
+      description: "理解reduce()窗口函数，如何进行增量聚合计算"
+
+    - id: flink_052
+      title: "窗口函数aggregate()：自定义聚合逻辑"
+      type: mechanism
+      description: "理解aggregate()窗口函数，如何实现自定义聚合逻辑"
+
+    - id: flink_053
+      title: "窗口函数process()：全量窗口处理"
+      type: mechanism
+      description: "理解process()窗口函数，如何访问窗口中的所有元素"
+
+    - id: flink_054
+      title: "窗口触发：Watermark如何触发窗口计算"
+      type: mechanism
+      description: "理解窗口何时触发计算，Watermark如何影响触发时机"
+
+    - id: flink_055
+      title: "窗口延迟数据：如何处理窗口关闭后的数据"
+      type: mechanism
+      description: "理解allowedLateness()，如何处理窗口关闭后到达的延迟数据"
+
+    # ========== 第六部分：状态管理 ==========
+    - id: flink_056
+      title: "ProcessFunction：访问状态和时间的函数"
+      type: concept
+      description: "理解ProcessFunction的作用，它是访问状态和时间的基础"
+
+    - id: flink_057
+      title: "ProcessFunction.processElement()：处理每个元素"
+      type: mechanism
+      description: "理解processElement()方法，如何在这里处理数据并访问状态"
+
+    - id: flink_058
+      title: "StateDescriptor：声明状态的元数据"
+      type: mechanism
+      description: "理解StateDescriptor的作用，如何声明状态的名称和类型"
+
+    - id: flink_059
+      title: "获取State：通过RuntimeContext获取状态"
+      type: mechanism
+      description: "理解如何通过RuntimeContext.getState()获取状态对象"
+
+    - id: flink_060
+      title: "ValueState：存储和更新单个值"
+      type: practice
+      description: "使用ValueState存储单个状态值，例如币安交易对的累计交易量"
+
+    - id: flink_061
+      title: "ValueState.value()：读取状态值"
+      type: mechanism
+      description: "理解如何使用value()方法读取ValueState中的值"
+
+    - id: flink_062
+      title: "ValueState.update()：更新状态值"
+      type: mechanism
+      description: "理解如何使用update()方法更新ValueState中的值"
+
+    - id: flink_063
+      title: "MapState：存储键值对集合"
+      type: practice
+      description: "使用MapState存储多个键值对，例如币安每个交易对的实时价格"
+
+    - id: flink_064
+      title: "MapState的基本操作：get、put、remove"
+      type: mechanism
+      description: "理解MapState的get()、put()、remove()等基本操作方法"
+
+    - id: flink_065
+      title: "ListState：存储元素列表"
+      type: practice
+      description: "使用ListState存储元素列表，例如存储最近N笔交易记录"
+
+    - id: flink_066
+      title: "状态的生命周期：创建、更新、清理"
+      type: mechanism
+      description: "理解状态何时创建、何时更新、何时清理的完整生命周期"
+
+    - id: flink_067
+      title: "状态TTL：设置状态的过期时间"
+      type: mechanism
+      description: "理解如何为状态设置TTL（Time To Live），自动清理过期状态"
+
+    # ========== 第七部分：综合实践 ==========
+    - id: flink_068
+      title: "币安Trade数据模型：设计交易数据类"
+      type: practice
+      description: "设计币安Trade数据的Java类，包含价格、数量、时间等字段"
+
+    - id: flink_069
+      title: "币安Ticker数据模型：设计行情数据类"
+      type: practice
+      description: "设计币安Ticker数据的Java类，包含最新价格、24小时涨跌幅等字段"
+
+    - id: flink_070
+      title: "实现序列化：确保数据可被Flink序列化"
+      type: practice
+      description: "实现Serializable接口或使用Flink的序列化器，确保数据类可被序列化"
+
+    - id: flink_071
+      title: "构建完整Source：整合WebSocket和数据模型"
+      type: practice
+      description: "整合WebSocket连接、JSON解析和数据模型，构建完整的币安数据源"
+
+    - id: flink_072
+      title: "实时价格监控：使用窗口统计价格变化"
+      type: practice
+      description: "使用窗口操作统计币安交易对的实时价格变化，计算涨跌幅"
+
+    - id: flink_073
+      title: "交易量统计：使用状态累计交易量"
+      type: practice
+      description: "使用ValueState累计每个交易对的交易量，实现实时统计"
+
+    - id: flink_074
+      title: "多交易对处理：使用keyBy按交易对分组"
+      type: practice
+      description: "使用keyBy()按交易对分组，为每个交易对独立处理数据"
+
+    - id: flink_075
+      title: "结果输出：将处理结果输出到控制台或文件"
+      type: practice
+      description: "使用print()或addSink()将处理结果输出，验证数据处理逻辑"
+
+    - id: flink_076
+      title: "错误处理策略：确保数据不丢失"
+      type: practice
+      description: "添加完整的异常处理，确保WebSocket断线重连不影响数据处理"
+
+    - id: flink_077
+      title: "性能优化：检查点和状态后端配置"
+      type: practice
+      description: "配置检查点和状态后端，确保作业的容错性和性能"

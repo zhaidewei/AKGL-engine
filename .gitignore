@@ -1,0 +1,9 @@
+learning_context_the_source_code/
+.vscode/
+.dify_sync_cache.json
+.env
+kb/
+learner_profile.md
+output/
+playGround/
+deprecated/
