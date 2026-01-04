@@ -35,10 +35,45 @@ learning_path:
       type: concept
       description: "理解本地执行环境的作用，何时使用它进行开发和测试"
 
+    - id: flink_006_1
+      title: "并行度：基本概念和设置"
+      type: concept
+      description: "理解并行度的概念，如何设置并行度，以及如何选择合适的并行度"
+
+    - id: flink_006_2
+      title: "并行度如何影响执行"
+      type: concept
+      description: "理解并行度如何影响数据分区、数据流流动和元素顺序"
+
+    - id: flink_006_3
+      title: "Operator Chaining（算子链）与并行度"
+      type: concept
+      description: "理解算子链式连接的概念，以及它与并行度的关系"
+
     - id: flink_007
       title: "集群执行环境：生产部署"
       type: concept
       description: "理解集群执行环境，如何连接到Flink集群"
+
+    - id: flink_007_1
+      title: "Flink 集群架构概述"
+      type: concept
+      description: "理解 Flink 集群的整体架构，JobManager 和 TaskManager 的基本角色"
+
+    - id: flink_007_2
+      title: "JobManager：集群的协调者"
+      type: concept
+      description: "理解 JobManager 的职责，它如何协调和管理集群"
+
+    - id: flink_007_3
+      title: "TaskManager：任务的执行者"
+      type: concept
+      description: "理解 TaskManager 的职责，它如何执行任务和管理资源"
+
+    - id: flink_007_4
+      title: "TaskManager Slot：资源的分配单元"
+      type: concept
+      description: "理解 Slot 的概念，它如何分配资源和控制并行度"
 
     - id: flink_008
       title: "execute()：触发作业执行的关键"

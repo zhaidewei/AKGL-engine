@@ -7,3 +7,6 @@ learner_profile.md
 output/
 playGround/
 deprecated/
+.DS_Store
+.idea/
+.vscode/

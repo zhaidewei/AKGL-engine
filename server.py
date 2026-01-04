@@ -428,6 +428,9 @@ HOME_TEMPLATE = """
                 let completed = 0;
                 let total = checkboxes.length;
 
+                // 存储模块总数到 localStorage，供其他页面使用
+                localStorage.setItem('totalModules', total.toString());
+
                 checkboxes.forEach(checkbox => {
                     const moduleId = checkbox.dataset.moduleId;
                     const isCompleted = progress[moduleId] === true;
@@ -589,7 +592,7 @@ MARKDOWN_TEMPLATE = """
         .complete-button {
             color: #ffffff;
             text-decoration: none;
-            padding: 10px 20px;
+            padding: 12px 20px;
             background: var(--button-bg);
             border-radius: 6px;
             transition: all 0.2s;
@@ -600,6 +603,7 @@ MARKDOWN_TEMPLATE = """
             display: inline-flex;
             align-items: center;
             gap: 6px;
+            flex: 0 0 auto;
         }
 
         .complete-button:hover {
@@ -657,6 +661,7 @@ MARKDOWN_TEMPLATE = """
         .nav-buttons {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             margin-top: 40px;
             padding-top: 30px;
             border-top: 2px solid var(--border-color);
@@ -959,10 +964,9 @@ MARKDOWN_TEMPLATE = """
         <div class="header">
             <h1>{{ title }}</h1>
             <div class="header-actions">
-                <button class="complete-button" id="completeButton" data-module-id="{{ module_id }}">
-                    <span id="completeIcon">✓</span>
-                    <span id="completeText">已完成</span>
-                </button>
+                <div class="progress-info">
+                    进度: <span class="progress-number" id="progressText">0/0</span>
+                </div>
                 <button class="theme-toggle" id="themeToggle" aria-label="切换主题">
                     <svg id="themeIcon" viewBox="0 0 16 16" width="16" height="16">
                         <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0ZM2 8a6 6 0 0 1 6-6v12a6 6 0 0 1-6-6Z"></path>
@@ -988,6 +992,11 @@ MARKDOWN_TEMPLATE = """
                 </div>
                 {% endif %}
 
+                <button class="complete-button" id="completeButton" data-module-id="{{ module_id }}">
+                    <span id="completeIcon">✓</span>
+                    <span id="completeText">标记完成</span>
+                </button>
+
                 {% if next_module %}
                 <a href="/view/{{ next_module.id }}" class="nav-button next">
                     <span class="nav-button-title">{{ next_module.title }} →</span>
@@ -1012,6 +1021,7 @@ MARKDOWN_TEMPLATE = """
             const completeIcon = document.getElementById('completeIcon');
             const completeText = document.getElementById('completeText');
             const moduleId = completeButton.dataset.moduleId;
+            const progressText = document.getElementById('progressText');
 
             // 从 localStorage 读取主题偏好，默认为 dark
             const currentTheme = localStorage.getItem('theme') || 'dark';
@@ -1061,8 +1071,25 @@ MARKDOWN_TEMPLATE = """
                 }
             }
 
-            // 初始化完成按钮状态
+            function updateProgress() {
+                const progress = getProgress();
+                // 从localStorage获取模块总数（由主页设置）
+                const totalModules = parseInt(localStorage.getItem('totalModules')) || 0;
+                let completed = 0;
+
+                // 计算已完成的数量
+                for (const id in progress) {
+                    if (progress[id] === true) {
+                        completed++;
+                    }
+                }
+
+                progressText.textContent = completed + '/' + totalModules;
+            }
+
+            // 初始化完成按钮状态和进度
             updateCompleteButton();
+            updateProgress();
 
             // 点击完成按钮
             completeButton.addEventListener('click', function() {
@@ -1071,6 +1098,7 @@ MARKDOWN_TEMPLATE = """
                 progress[moduleId] = !isCompleted;
                 saveProgress(progress);
                 updateCompleteButton();
+                updateProgress();
             });
         })();
     </script>
