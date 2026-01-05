@@ -1,0 +1,16 @@
+# LEARNER
+KNOWLEDGE_BASE_FOLDER: input/kb/
+PREVIOUS_QUESTIONS: input/questions/
+CV: input/learner_profile.md
+LEARNER_PROFILE: input/learner_profile.md
+
+# LEARNING_MATERIAL
+SOURCE_CODE: input/learning_context_the_source_code/flink/
+SOURCE_CODE_ROOT: input/learning_context_the_source_code/
+ARTICLE: ""
+
+LEARNING_GOAL: input/this_is_what_I_want_to_learn.yaml
+
+# OUTPUT
+GENERATED_LEARNING_MATERIAL_FOLDER: output/
+AUDIT_REPORT: output/audit_report_reviewer.md

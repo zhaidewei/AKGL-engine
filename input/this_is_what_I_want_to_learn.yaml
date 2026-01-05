@@ -82,34 +82,34 @@ learning_path:
 
     # ========== 第二部分：数据源（Source） ==========
     - id: flink_009
-      title: "SourceFunction接口：自定义数据源的基础"
+      title: "Source接口：自定义数据源的基础（新API）"
       type: mechanism
-      description: "理解SourceFunction接口的定义，它是所有自定义数据源的基类"
+      description: "理解Source接口的定义，它是新API中所有自定义数据源的基类"
 
     - id: flink_010
-      title: "SourceFunction的run()方法：数据生成的核心"
+      title: "SourceReader：数据读取的核心组件"
       type: mechanism
-      description: "理解run()方法的作用，它是数据生成的主要逻辑所在"
+      description: "理解SourceReader接口的作用，它是新API中数据读取的主要组件"
 
     - id: flink_011
-      title: "SourceFunction的cancel()方法：优雅停止"
+      title: "SourceReader的启动和关闭：生命周期管理"
       type: mechanism
-      description: "理解cancel()方法的作用，如何实现优雅停止数据源"
+      description: "理解SourceReader的start()和close()方法，如何管理数据源的启动和关闭"
 
     - id: flink_012
-      title: "SourceContext：数据发送的上下文对象"
+      title: "SourceReaderContext：读取器的上下文对象"
       type: concept
-      description: "理解SourceContext是什么，它提供了哪些方法"
+      description: "理解SourceReaderContext是什么，它提供了哪些方法"
 
     - id: flink_013
-      title: "SourceContext.collect()：发送数据到流中"
+      title: "SourceReader.emitRecord()：发送数据到流中"
       type: mechanism
-      description: "理解如何使用collect()方法将数据发送到Flink流中"
+      description: "理解如何使用emitRecord()方法将数据发送到Flink流中"
 
     - id: flink_014
-      title: "SourceContext.collectWithTimestamp()：带时间戳的数据"
+      title: "SourceReader的时间戳处理：事件时间支持"
       type: mechanism
-      description: "理解如何发送带时间戳的数据，用于事件时间处理"
+      description: "理解如何在SourceReader中处理时间戳，支持事件时间处理"
 
     - id: flink_015
       title: "WebSocket客户端库选择：OkHttp vs Java-WebSocket"
@@ -122,14 +122,14 @@ learning_path:
       description: "理解币安WebSocket API的URL格式，如何订阅trade stream和ticker stream"
 
     - id: flink_017
-      title: "建立WebSocket连接：在SourceFunction中初始化"
+      title: "建立WebSocket连接：在SourceReader中初始化"
       type: practice
-      description: "在SourceFunction的构造函数或open()方法中建立WebSocket连接"
+      description: "在SourceReader的start()方法中建立WebSocket连接"
 
     - id: flink_018
       title: "WebSocket消息监听：接收币安数据"
       type: practice
-      description: "实现WebSocket消息监听器，接收币安推送的交易数据"
+      description: "实现WebSocket消息监听器，在SourceReader中接收币安推送的交易数据"
 
     - id: flink_019
       title: "JSON解析：将币安消息转换为Java对象"
@@ -139,7 +139,7 @@ learning_path:
     - id: flink_020
       title: "emit数据到Flink流：连接WebSocket和DataStream"
       type: practice
-      description: "将解析后的币安交易数据通过SourceContext.emit()发送到Flink流中"
+      description: "将解析后的币安交易数据通过SourceReader.emitRecord()发送到Flink流中"
 
     - id: flink_021
       title: "WebSocket连接异常处理：捕获和记录错误"

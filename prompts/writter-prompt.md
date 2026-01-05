@@ -4,25 +4,27 @@
 
 ## 背景
 
+**重要：所有路径配置请从 CONFIG 文件中读取，不要使用硬编码路径。**
+
 以下文件是唯一可信来源，用于判断我已掌握的知识与能力,禁止基于常识、经验或猜测进行补全。
-[我的学习者画像, 含职业背景与技能](./learner_profile.md)
-[我的知识库笔记, 我已经学过 / 理解过的内容](./kb/)
-[我的学习目标,高层目标，可能不完整](./this_is_what_I_want_to_learn.yaml)
-[原始学习材料, 例如 Flink 源代码、官方实现](./learning_context_the_source_code/)
+[我的学习者画像, 含职业背景与技能](./CONFIG#LEARNER_PROFILE)
+[我的知识库笔记, 我已经学过 / 理解过的内容](./CONFIG#KNOWLEDGE_BASE_FOLDER)
+[我的学习目标,高层目标，可能不完整](./CONFIG#LEARNING_GOAL)
+[原始学习材料, 例如 Flink 源代码、官方实现](./CONFIG#SOURCE_CODE_ROOT)
 
 ## 知识判断优先级（必须严格遵守）
 
-kb/ 中明确记录的知识
-learner_profile.md（简历 / 技能描述）
+CONFIG#KNOWLEDGE_BASE_FOLDER 中明确记录的知识
+CONFIG#LEARNER_PROFILE（简历 / 技能描述）
 其他一律视为我尚未掌握
 
 ## 学习目标的输入
 
-我会写在 this_is_what_I_want_to_learn.md里
+我会写在 CONFIG#LEARNING_GOAL 里
 
-## 输出要求（输出到 output/ 文件夹）
+## 输出要求（输出到 CONFIG#GENERATED_LEARNING_MATERIAL_FOLDER 文件夹）
 
-你需要在 output/ 目录中生成以下内容:
+你需要在 CONFIG#GENERATED_LEARNING_MATERIAL_FOLDER 目录中生成以下内容:
 一个 yaml 格式的学习路线图
 每一个学习点，对应一个 md 格式的阅读文档
 
@@ -63,6 +65,7 @@ type: concept | mechanism | practice
 
 * 前面的学习点不能依赖后面的, 允许你补充我缺失的前置知识,调整学习顺序
 * 必须采用 20/80 原则:绕开低效、边缘、学术化内容,结合我的背景，优先选择对我职业最有价值的内容
+* 以 CONFIG#SOURCE_CODE_ROOT 的实际版本为准（2.2.0），禁止使用该目录中找不到的 API。
 
 Step 4:确认点（强制停机）
 
@@ -76,7 +79,7 @@ Step 5:生成阅读材料
 
 以 学习目标 YAML 作为唯一输入
 
-在 output/ 文件夹中:
+在 CONFIG#GENERATED_LEARNING_MATERIAL_FOLDER 文件夹中:
 按顺序为每一个学习点生成一个 md 文件, 文件名使用学习点的 id
 
 每一篇 MD 文档必须遵守以下规则
@@ -84,7 +87,7 @@ Step 5:生成阅读材料
 1. 低认知负担表达
 
 优先使用:直觉, 类比, 结构化表达
-尽量使用:我已经掌握的术语与概念（参考 kb/ 与 learner_profile.md）
+尽量使用:我已经掌握的术语与概念（参考 CONFIG#KNOWLEDGE_BASE_FOLDER 与 CONFIG#LEARNER_PROFILE）
 
 2. 避免低效写法
 
@@ -94,7 +97,7 @@ Step 5:生成阅读材料
 
 3. 源码关联（强制）
 
-必须说明:概念 / 机制 / 处理逻辑 来自哪里, 在 ./learning_context_the_source_code/ 中:
+必须说明:概念 / 机制 / 处理逻辑 来自哪里, 在 CONFIG#SOURCE_CODE_ROOT 中:
 
 概念:寻找相关 class / interface
 处理逻辑:寻找相关 function / method
@@ -108,17 +111,19 @@ Step 5:生成阅读材料
 
 每篇文档必须包含以下小节:
 
-```
-## 什么时候你需要想到这个？
+4.1 MD 顶部先输出一个 Terminology 小节，列出使用的关键术语，标注是否来自 KB
+
+4.2 什么时候你需要想到这个？
 
 - 当你遇到 ...
 - 当你发现 ...
 - 当你需要在 xxx 中解决 ...
-```
+
 
 ### 全局约束（必须遵守）
 
-不得假设我掌握任何未在 KB 或简历中出现的知识
+不得假设我掌握任何未在 CONFIG#KNOWLEDGE_BASE_FOLDER 或 CONFIG#LEARNER_PROFILE 中出现的知识
+每篇文档至少 3 个关键断言（机制/行为/边界）必须给出源码定位；找不到就必须降级为"假设/可能"并提示你验证
 不得跳过任何「停止 / 等待确认」步骤
 不得一次性生成 yaml + md
 

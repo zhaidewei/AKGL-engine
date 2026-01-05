@@ -12,8 +12,41 @@ app = Flask(__name__)
 
 # 项目根目录
 BASE_DIR = Path(__file__).parent
-YAML_FILE = BASE_DIR / "this_is_what_I_want_to_learn.yaml"
-OUTPUT_DIR = BASE_DIR / "output"
+
+
+def load_config():
+    """从 CONFIG 文件加载配置"""
+    config = {}
+    config_file = BASE_DIR / "CONFIG"
+
+    if not config_file.exists():
+        raise FileNotFoundError(f"CONFIG file not found at {config_file}")
+
+    with open(config_file, 'r', encoding='utf-8') as f:
+        for line in f:
+            line = line.strip()
+            # 跳过空行和注释行
+            if not line or line.startswith('#'):
+                continue
+            # 解析 key: value 格式
+            if ':' in line:
+                key, value = line.split(':', 1)
+                key = key.strip()
+                value = value.strip()
+                # 移除引号（如果有）
+                if value.startswith('"') and value.endswith('"'):
+                    value = value[1:-1]
+                config[key] = value
+
+    return config
+
+
+# 加载配置
+CONFIG = load_config()
+
+# 从 CONFIG 读取路径
+YAML_FILE = BASE_DIR / CONFIG.get('LEARNING_GOAL', 'input/this_is_what_I_want_to_learn.yaml')
+OUTPUT_DIR = BASE_DIR / CONFIG.get('GENERATED_LEARNING_MATERIAL_FOLDER', 'output')
 
 # 主页 HTML 模板
 HOME_TEMPLATE = """
@@ -85,7 +118,7 @@ HOME_TEMPLATE = """
         .header {
             background: var(--bg-secondary);
             color: var(--text-primary);
-            padding: 40px 30px;
+            padding: 90px 30px 40px 30px;
             text-align: center;
             border-bottom: 2px solid var(--border-color);
             position: relative;
@@ -113,6 +146,7 @@ HOME_TEMPLATE = """
             align-items: center;
             gap: 6px;
             transition: all 0.2s ease;
+            white-space: nowrap;
         }
 
         .theme-toggle:hover {
@@ -130,14 +164,51 @@ HOME_TEMPLATE = """
             background: var(--bg-tertiary);
             border: 1px solid var(--border-color);
             border-radius: 6px;
-            padding: 8px 16px;
+            padding: 8px 12px;
             font-size: 14px;
             color: var(--text-primary);
             font-weight: 600;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-width: 140px;
+            max-width: 160px;
         }
 
         .progress-info .progress-number {
             color: var(--link-color);
+        }
+
+        .progress-info > div:first-child {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            white-space: nowrap;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 6px;
+            background: var(--bg-secondary);
+            border-radius: 3px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--link-color), var(--link-hover));
+            border-radius: 3px;
+            transition: width 0.3s ease;
+            min-width: 2px;
+        }
+
+        [data-theme="dark"] .progress-bar-fill {
+            background: linear-gradient(90deg, #238636, #2ea043);
+        }
+
+        [data-theme="light"] .progress-bar-fill {
+            background: linear-gradient(90deg, #2da44e, #2c974b);
         }
 
         .header h1 {
@@ -346,7 +417,13 @@ HOME_TEMPLATE = """
         <div class="header">
             <div class="header-actions">
                 <div class="progress-info">
-                    进度: <span class="progress-number" id="progressText">0/0</span>
+                    <div>
+                        <span>进度:</span>
+                        <span class="progress-number" id="progressText">0/0</span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" id="progressBar" style="width: 0%;"></div>
+                    </div>
                 </div>
                 <button class="theme-toggle" id="themeToggle" aria-label="切换主题">
                     <svg id="themeIcon" viewBox="0 0 16 16" width="16" height="16">
@@ -446,6 +523,13 @@ HOME_TEMPLATE = """
                 });
 
                 progressText.textContent = completed + '/' + total;
+
+                // 更新进度条
+                const progressBar = document.getElementById('progressBar');
+                if (progressBar && total > 0) {
+                    const percentage = (completed / total) * 100;
+                    progressBar.style.width = percentage + '%';
+                }
             }
 
             // 初始化进度
@@ -555,6 +639,57 @@ MARKDOWN_TEMPLATE = """
             display: flex;
             gap: 12px;
             align-items: center;
+        }
+
+        .progress-info {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 14px;
+            color: var(--text-primary);
+            font-weight: 600;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-width: 140px;
+            max-width: 160px;
+        }
+
+        .progress-info .progress-number {
+            color: var(--link-color);
+        }
+
+        .progress-info > div:first-child {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            white-space: nowrap;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 6px;
+            background: var(--bg-secondary);
+            border-radius: 3px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--link-color), var(--link-hover));
+            border-radius: 3px;
+            transition: width 0.3s ease;
+            min-width: 2px;
+        }
+
+        [data-theme="dark"] .progress-bar-fill {
+            background: linear-gradient(90deg, #238636, #2ea043);
+        }
+
+        [data-theme="light"] .progress-bar-fill {
+            background: linear-gradient(90deg, #2da44e, #2c974b);
         }
 
         .theme-toggle {
@@ -965,7 +1100,13 @@ MARKDOWN_TEMPLATE = """
             <h1>{{ title }}</h1>
             <div class="header-actions">
                 <div class="progress-info">
-                    进度: <span class="progress-number" id="progressText">0/0</span>
+                    <div>
+                        <span>进度:</span>
+                        <span class="progress-number" id="progressText">0/0</span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" id="progressBar" style="width: 0%;"></div>
+                    </div>
                 </div>
                 <button class="theme-toggle" id="themeToggle" aria-label="切换主题">
                     <svg id="themeIcon" viewBox="0 0 16 16" width="16" height="16">
@@ -1085,6 +1226,13 @@ MARKDOWN_TEMPLATE = """
                 }
 
                 progressText.textContent = completed + '/' + totalModules;
+
+                // 更新进度条
+                const progressBar = document.getElementById('progressBar');
+                if (progressBar && totalModules > 0) {
+                    const percentage = (completed / totalModules) * 100;
+                    progressBar.style.width = percentage + '%';
+                }
             }
 
             // 初始化完成按钮状态和进度
