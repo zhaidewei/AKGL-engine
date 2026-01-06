@@ -58,6 +58,7 @@ flowchart LR
     style G fill:#d4edda
 ```
 
+
 首先把被学习的代码库放在 context 里
 已经学习的内容整理成知识图谱/知识库
 输入一篇学习材料，也可以是一个query 一句话。
@@ -69,3 +70,53 @@ flowchart LR
 
 基于Dify的产品 (可以分享)
 知识库与笔记软件集成
+
+
+# Step by Step procedure
+
+Step0 Context 准备
+
+Learner KB
+Learner CV
+Learner Goal
+
+Source Code
+
+Step 1: high level learning object analysis
+
+1.1 From wish to an output project design.
+
+Decide and design an output project to a level that it is clear to make a list of knowledge that the learner should know to build this project.
+
+Review the project design to see if the architect is the best.
+
+1.2 From project to learning objects.
+
+From high wish to detailed learning object lists. If the learner knows these objects, he/she should be able to achive the learning goal.
+
+1.3 Refine those learning objects to smaller size (congnition load light)
+
+1.4 Look for missing pre-requesite points and mark already known points.
+
+1.5 adjust the sequences.
+
+
+
+Step 2. Make Learning Roadmap Specification
+
+Design an End 2 End working system and break it up into content components.
+
+Use reviewer LLM to choose a proper engineering design.
+
+Focus on content choosen.
+
+
+Step 3. Detailed learning material.
+
+TODO：review里需要加一个 寻找高复杂度的代码，用伪代码替换，但是把复杂代码放在某个可以继续查看的地方，例如附录。
+
+最小可用例子，可以是前后几个章节共享一个，但是他们聚焦在自己的部分
+
+TODO：review的时候，需要对最后的工程项目做一个 分析和拆解，说说各个部分选择是否合理
+
+TODO：如果用户不知道什么工程项目，LLM负责给出一个建议。这个项目要有好的覆盖性和低的依赖性。

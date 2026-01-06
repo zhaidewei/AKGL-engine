@@ -81,6 +81,11 @@ learning_path:
       description: "理解为什么需要显式调用execute()才能启动Flink作业，懒加载机制"
 
     # ========== 第二部分：数据源（Source） ==========
+    - id: flink_009_01
+      title: "SplitEnumerator：数据源分片的管理者"
+      type: concept
+      description: "理解SplitEnumerator的作用，它是新Source API中管理和分配数据分片的核心组件"
+
     - id: flink_009
       title: "Source接口：自定义数据源的基础（新API）"
       type: mechanism
