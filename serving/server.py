@@ -5,13 +5,14 @@
 import os
 import yaml
 import markdown
-from flask import Flask, render_template_string, send_from_directory, abort
+import re
+from flask import Flask, render_template_string, send_from_directory, abort, request, make_response
 from pathlib import Path
 
 app = Flask(__name__)
 
-# 项目根目录
-BASE_DIR = Path(__file__).parent
+# 项目根目录（从 serving/ 目录回到项目根目录）
+BASE_DIR = Path(__file__).parent.parent
 
 
 def load_config():
@@ -45,8 +46,39 @@ def load_config():
 CONFIG = load_config()
 
 # 从 CONFIG 读取路径
+# 支持两种模式：
+# 1. 传统模式：使用 YAML 文件 + output 目录
+# 2. 新模式：使用 outline markdown + generated_v1 目录
+USE_OUTLINE_MODE = CONFIG.get('USE_OUTLINE_MODE', 'false').lower() == 'true'
+OUTLINE_FILE = BASE_DIR / CONFIG.get('LEARNING_OUTLINE', 'generation_pipeline/step2_output_project_skills_needed/knowledge_and_skills_needed_v2.md')
+GENERATED_CONTENT_DIR_EN = BASE_DIR / CONFIG.get('GENERATED_CONTENT_DIR', 'generation_pipeline/step3_learning_material/generated_v1')
+GENERATED_CONTENT_DIR_ZH = BASE_DIR / CONFIG.get('GENERATED_CONTENT_DIR_ZH', 'generation_pipeline/step3_learning_material/generated_v1_translated')
+
 YAML_FILE = BASE_DIR / CONFIG.get('LEARNING_GOAL', 'input/this_is_what_I_want_to_learn.yaml')
 OUTPUT_DIR = BASE_DIR / CONFIG.get('GENERATED_LEARNING_MATERIAL_FOLDER', 'output')
+
+
+def get_language():
+    """从请求中获取语言设置（cookie 或 URL 参数）"""
+    # 优先从 URL 参数获取
+    lang = request.args.get('lang', '').lower()
+    if lang in ['en', 'zh', 'zh-cn']:
+        return 'zh' if lang in ['zh', 'zh-cn'] else 'en'
+
+    # 从 cookie 获取
+    lang = request.cookies.get('language', 'en').lower()
+    return 'zh' if lang in ['zh', 'zh-cn'] else 'en'
+
+
+def get_content_dir(language=None):
+    """根据语言获取内容目录"""
+    if language is None:
+        language = get_language()
+
+    if USE_OUTLINE_MODE:
+        return GENERATED_CONTENT_DIR_ZH if language == 'zh' else GENERATED_CONTENT_DIR_EN
+    else:
+        return OUTPUT_DIR
 
 # 主页 HTML 模板
 HOME_TEMPLATE = """
@@ -132,6 +164,27 @@ HOME_TEMPLATE = """
             display: flex;
             gap: 12px;
             align-items: center;
+        }
+
+        .language-toggle {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 8px 12px;
+            cursor: pointer;
+            color: var(--text-primary);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            text-decoration: none;
+        }
+
+        .language-toggle:hover {
+            background: var(--bg-hover);
+            border-color: var(--link-color);
         }
 
         .theme-toggle {
@@ -425,6 +478,9 @@ HOME_TEMPLATE = """
                         <div class="progress-bar-fill" id="progressBar" style="width: 0%;"></div>
                     </div>
                 </div>
+                <a href="?lang={{ 'en' if current_lang == 'zh' else 'zh' }}" class="language-toggle" id="languageToggle">
+                    <span id="languageText">{{ 'English' if current_lang == 'zh' else '中文' }}</span>
+                </a>
                 <button class="theme-toggle" id="themeToggle" aria-label="切换主题">
                     <svg id="themeIcon" viewBox="0 0 16 16" width="16" height="16">
                         <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0ZM2 8a6 6 0 0 1 6-6v12a6 6 0 0 1-6-6Z"></path>
@@ -443,7 +499,7 @@ HOME_TEMPLATE = """
                     {% for module in section.modules %}
                     <li class="module-item" data-module-id="{{ module.id }}">
                         <input type="checkbox" class="module-checkbox" id="check-{{ module.id }}" data-module-id="{{ module.id }}">
-                        <a href="/view/{{ module.id }}" class="module-link">
+                        <a href="/view/{{ module.id }}?lang={{ current_lang }}" class="module-link">
                             <div class="module-title">
                                 <span class="module-id">{{ module.id }}</span>
                                 {{ module.title }}
@@ -639,6 +695,27 @@ MARKDOWN_TEMPLATE = """
             display: flex;
             gap: 12px;
             align-items: center;
+        }
+
+        .language-toggle {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 8px 12px;
+            cursor: pointer;
+            color: var(--text-primary);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            text-decoration: none;
+        }
+
+        .language-toggle:hover {
+            background: var(--bg-hover);
+            border-color: var(--link-color);
         }
 
         .progress-info {
@@ -1108,6 +1185,9 @@ MARKDOWN_TEMPLATE = """
                         <div class="progress-bar-fill" id="progressBar" style="width: 0%;"></div>
                     </div>
                 </div>
+                <a href="/view/{{ module_id }}?lang={{ 'en' if current_lang == 'zh' else 'zh' }}" class="language-toggle" id="languageToggle">
+                    <span id="languageText">{{ 'English' if current_lang == 'zh' else '中文' }}</span>
+                </a>
                 <button class="theme-toggle" id="themeToggle" aria-label="切换主题">
                     <svg id="themeIcon" viewBox="0 0 16 16" width="16" height="16">
                         <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0ZM2 8a6 6 0 0 1 6-6v12a6 6 0 0 1-6-6Z"></path>
@@ -1122,7 +1202,7 @@ MARKDOWN_TEMPLATE = """
 
             <div class="nav-buttons">
                 {% if prev_module %}
-                <a href="/view/{{ prev_module.id }}" class="nav-button prev">
+                <a href="/view/{{ prev_module.id }}?lang={{ current_lang }}" class="nav-button prev">
                     <span class="nav-button-label">上一页</span>
                     <span class="nav-button-title">← {{ prev_module.title }}</span>
                 </a>
@@ -1139,7 +1219,7 @@ MARKDOWN_TEMPLATE = """
                 </button>
 
                 {% if next_module %}
-                <a href="/view/{{ next_module.id }}" class="nav-button next">
+                <a href="/view/{{ next_module.id }}?lang={{ current_lang }}" class="nav-button next">
                     <span class="nav-button-title">{{ next_module.title }} →</span>
                     <span class="nav-button-label">下一页</span>
                 </a>
@@ -1255,93 +1335,272 @@ MARKDOWN_TEMPLATE = """
 """
 
 
+def normalize_to_filename(section_num, title):
+    """将章节编号和标题转换为文件名格式
+    例如: (1.1, "Flink Architecture and Execution Model") -> "1.1_flink_architecture_and_execution_model"
+    """
+    # 移除特殊字符，转换为小写，用下划线替换空格
+    normalized = re.sub(r'[^\w\s-]', '', title.lower())
+    normalized = re.sub(r'[-\s]+', '_', normalized)
+    normalized = normalized.strip('_')
+    return f"{section_num}_{normalized}"
+
+
+def parse_outline_markdown():
+    """解析 outline markdown 文件，构建学习路径结构"""
+    if not OUTLINE_FILE.exists():
+        raise FileNotFoundError(f"Outline file not found at {OUTLINE_FILE}")
+
+    with open(OUTLINE_FILE, 'r', encoding='utf-8') as f:
+        content = f.read()
+
+    lines = content.split('\n')
+    modules = []
+    sections = []
+    current_section = None
+    current_section_title = None
+
+    for i, line in enumerate(lines):
+        line = line.strip()
+
+        # 解析主章节 (## 1. Flink Fundamentals)
+        if line.startswith('## ') and not line.startswith('###'):
+            # 提取章节标题（去掉编号）
+            match = re.match(r'^##\s+(\d+)\.\s+(.+)$', line)
+            if match:
+                section_num = match.group(1)
+                section_title = match.group(2)
+                current_section = {
+                    'num': section_num,
+                    'title': section_title,
+                    'first_module_id': None
+                }
+                sections.append(current_section)
+
+        # 解析子模块 (### 1.1 Flink Architecture and Execution Model)
+        elif line.startswith('### '):
+            match = re.match(r'^###\s+(\d+\.\d+)\s+(.+)$', line)
+            if match:
+                section_num = match.group(1)
+                title = match.group(2)
+
+                # 提取描述（下一行的内容，直到下一个 ### 或 ##）
+                description_lines = []
+                for j in range(i + 1, min(i + 15, len(lines))):
+                    next_line = lines[j].strip()
+                    if next_line.startswith('###') or next_line.startswith('##') or next_line == '---':
+                        break
+                    if next_line and not next_line.startswith('- **Why'):
+                        # 提取第一个要点作为描述
+                        if next_line.startswith('- '):
+                            desc = next_line[2:].strip()
+                            # 移除粗体标记，但保留内容
+                            desc = re.sub(r'\*\*([^*]+)\*\*:', r'\1:', desc)
+                            desc = re.sub(r'\*\*([^*]+)\*\*', r'\1', desc)
+                            # 如果描述太长，截取前100个字符
+                            if len(desc) > 100:
+                                desc = desc[:97] + '...'
+                            description_lines.append(desc)
+                            break
+
+                description = description_lines[0] if description_lines else title
+
+                # 生成模块 ID（使用章节编号）
+                module_id = section_num
+
+                # 确定类型（根据标题关键词）
+                module_type = 'concept'
+                title_lower = title.lower()
+                if any(keyword in title_lower for keyword in ['implementation', 'configuration', 'deployment', 'testing']):
+                    module_type = 'practice'
+                elif any(keyword in title_lower for keyword in ['pattern', 'algorithm', 'formula', 'calculation']):
+                    module_type = 'mechanism'
+
+                module = {
+                    'id': module_id,
+                    'title': title,
+                    'type': module_type,
+                    'description': description
+                }
+                modules.append(module)
+
+                # 记录当前章节的第一个模块
+                if current_section and current_section['first_module_id'] is None:
+                    current_section['first_module_id'] = module_id
+
+    # 构建学习路径结构
+    learning_path = {
+        'title': 'MarketLag Project Learning Path',
+        'description': 'Knowledge and skills needed to build the MarketLag project',
+        'modules': modules
+    }
+
+    return learning_path, sections
+
+
 def load_yaml_data():
     """加载 YAML 文件数据"""
     with open(YAML_FILE, 'r', encoding='utf-8') as f:
         return yaml.safe_load(f)
 
 
-def organize_modules_by_section(modules):
-    """按注释中的部分组织模块"""
-    # 读取原始 YAML 文件来提取注释信息
-    section_info = []
-    with open(YAML_FILE, 'r', encoding='utf-8') as f:
-        content = f.read()
-        lines = content.split('\n')
+def organize_modules_by_section(modules, outline_sections=None):
+    """按部分组织模块
 
-        # 找到所有部分标记
-        for i, line in enumerate(lines):
-            if '==========' in line and '部分' in line:
-                # 提取部分标题（例如："第一部分：Flink基础概念"）
-                # 格式: # ========== 第一部分：Flink基础概念 ==========
-                if '：' in line:
-                    parts = line.split('：')
-                    if len(parts) >= 2:
-                        # 获取"第一部分"等前缀
-                        prefix = parts[0].split('=')[-1].strip()
-                        # 获取标题部分
-                        title_part = parts[1].split('=')[0].strip()
-                        title = f"{prefix}：{title_part}"
+    Args:
+        modules: 模块列表
+        outline_sections: 如果使用 outline 模式，传入解析的章节信息
+    """
+    if USE_OUTLINE_MODE and outline_sections:
+        # 使用 outline 模式的章节信息
+        sections = []
+        module_id_to_index = {m['id']: i for i, m in enumerate(modules)}
+
+        for i, section_info in enumerate(outline_sections):
+            first_module_id = section_info.get('first_module_id')
+            if first_module_id is None:
+                continue
+
+            start_idx = module_id_to_index.get(first_module_id)
+            if start_idx is None:
+                continue
+
+            # 找到下一个 section 的起始位置，或者到末尾
+            end_idx = len(modules)
+            if i + 1 < len(outline_sections):
+                next_first_id = outline_sections[i + 1].get('first_module_id')
+                if next_first_id:
+                    next_start = module_id_to_index.get(next_first_id)
+                    if next_start is not None:
+                        end_idx = next_start
+
+            sections.append({
+                'title': f"{section_info['num']}. {section_info['title']}",
+                'modules': modules[start_idx:end_idx]
+            })
+
+        return sections
+    else:
+        # 传统 YAML 模式：读取原始 YAML 文件来提取注释信息
+        section_info = []
+        with open(YAML_FILE, 'r', encoding='utf-8') as f:
+            content = f.read()
+            lines = content.split('\n')
+
+            # 找到所有部分标记
+            for i, line in enumerate(lines):
+                if '==========' in line and '部分' in line:
+                    # 提取部分标题（例如："第一部分：Flink基础概念"）
+                    # 格式: # ========== 第一部分：Flink基础概念 ==========
+                    if '：' in line:
+                        parts = line.split('：')
+                        if len(parts) >= 2:
+                            # 获取"第一部分"等前缀
+                            prefix = parts[0].split('=')[-1].strip()
+                            # 获取标题部分
+                            title_part = parts[1].split('=')[0].strip()
+                            title = f"{prefix}：{title_part}"
+                        else:
+                            title = line.split('=')[1].strip() if '=' in line else line.strip()
                     else:
+                        # 如果没有冒号，直接提取标题
                         title = line.split('=')[1].strip() if '=' in line else line.strip()
-                else:
-                    # 如果没有冒号，直接提取标题
-                    title = line.split('=')[1].strip() if '=' in line else line.strip()
 
-                # 查找这个标记后的第一个模块 id
-                for j in range(i + 1, min(i + 20, len(lines))):
-                    if 'id:' in lines[j]:
-                        module_id = lines[j].split('id:')[1].strip()
-                        section_info.append({
-                            'title': title,
-                            'first_module_id': module_id
-                        })
-                        break
+                    # 查找这个标记后的第一个模块 id
+                    for j in range(i + 1, min(i + 20, len(lines))):
+                        if 'id:' in lines[j]:
+                            module_id = lines[j].split('id:')[1].strip()
+                            section_info.append({
+                                'title': title,
+                                'first_module_id': module_id
+                            })
+                            break
 
-    # 组织模块到各个 section
-    sections = []
-    module_id_to_index = {m['id']: i for i, m in enumerate(modules)}
+        # 组织模块到各个 section
+        sections = []
+        module_id_to_index = {m['id']: i for i, m in enumerate(modules)}
 
-    for i, info in enumerate(section_info):
-        start_idx = module_id_to_index.get(info['first_module_id'])
-        if start_idx is None:
-            continue
+        for i, info in enumerate(section_info):
+            start_idx = module_id_to_index.get(info['first_module_id'])
+            if start_idx is None:
+                continue
 
-        # 找到下一个 section 的起始位置，或者到末尾
-        end_idx = len(modules)
-        if i + 1 < len(section_info):
-            next_start = module_id_to_index.get(section_info[i + 1]['first_module_id'])
-            if next_start is not None:
-                end_idx = next_start
+            # 找到下一个 section 的起始位置，或者到末尾
+            end_idx = len(modules)
+            if i + 1 < len(section_info):
+                next_start = module_id_to_index.get(section_info[i + 1]['first_module_id'])
+                if next_start is not None:
+                    end_idx = next_start
 
-        sections.append({
-            'title': info['title'],
-            'modules': modules[start_idx:end_idx]
-        })
+            sections.append({
+                'title': info['title'],
+                'modules': modules[start_idx:end_idx]
+            })
 
-    return sections
+        return sections
 
 
 @app.route('/')
 def index():
     """主页：显示学习路径目录"""
-    data = load_yaml_data()
-    learning_path = data['learning_path']
+    # 获取语言设置
+    language = get_language()
 
-    sections = organize_modules_by_section(learning_path['modules'])
+    if USE_OUTLINE_MODE:
+        learning_path, outline_sections = parse_outline_markdown()
+        sections = organize_modules_by_section(learning_path['modules'], outline_sections)
+    else:
+        data = load_yaml_data()
+        learning_path = data['learning_path']
+        sections = organize_modules_by_section(learning_path['modules'])
 
-    return render_template_string(
+    # 创建响应并设置cookie
+    response = make_response(render_template_string(
         HOME_TEMPLATE,
         title=learning_path['title'],
         description=learning_path['description'],
-        sections=sections
-    )
+        sections=sections,
+        current_lang=language
+    ))
+    response.set_cookie('language', language, max_age=31536000)  # 1年
+    return response
 
 
 @app.route('/view/<module_id>')
 def view_markdown(module_id):
     """查看指定模块的 Markdown 文件"""
-    md_file = OUTPUT_DIR / f"{module_id}.md"
+    # 获取语言设置
+    language = get_language()
+    content_dir = get_content_dir(language)
+
+    if USE_OUTLINE_MODE:
+        # 在 generated_v1 或 generated_v1_translated 目录中查找文件
+        # 模块 ID 格式: "1.1"，需要找到对应的文件 "1.1_flink_architecture_and_execution_model.md"
+        # 先尝试直接匹配（如果 module_id 包含下划线，可能是完整文件名）
+        md_file = content_dir / f"{module_id}.md"
+
+        # 如果直接匹配失败，尝试查找以 module_id 开头的文件
+        if not md_file.exists():
+            # 转义特殊字符用于 glob
+            escaped_id = module_id.replace('.', '.')
+            pattern = f"{escaped_id}_*.md"
+            matching_files = list(content_dir.glob(pattern))
+            if matching_files:
+                # 选择第一个匹配的文件（应该只有一个）
+                md_file = matching_files[0]
+            else:
+                abort(404)
+
+        # 获取模块信息
+        learning_path, _ = parse_outline_markdown()
+        modules = learning_path['modules']
+    else:
+        # 传统模式：从 OUTPUT_DIR 读取
+        md_file = OUTPUT_DIR / f"{module_id}.md"
+
+        # 获取模块信息
+        data = load_yaml_data()
+        modules = data['learning_path']['modules']
 
     if not md_file.exists():
         abort(404)
@@ -1370,9 +1629,7 @@ def view_markdown(module_id):
         }
     )
 
-    # 获取模块标题（从 YAML 中）
-    data = load_yaml_data()
-    modules = data['learning_path']['modules']
+    # 获取模块标题
     module_info = next((m for m in modules if m['id'] == module_id), None)
     title = module_info['title'] if module_info else module_id
 
@@ -1387,14 +1644,18 @@ def view_markdown(module_id):
                 next_module = modules[i + 1]
             break
 
-    return render_template_string(
+    # 创建响应并设置cookie
+    response = make_response(render_template_string(
         MARKDOWN_TEMPLATE,
         title=title,
         content=html_content,
         module_id=module_id,
         prev_module=prev_module,
-        next_module=next_module
-    )
+        next_module=next_module,
+        current_lang=language
+    ))
+    response.set_cookie('language', language, max_age=31536000)  # 1年
+    return response
 
 
 if __name__ == '__main__':

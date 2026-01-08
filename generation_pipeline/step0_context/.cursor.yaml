@@ -1,0 +1,14 @@
+current_folder: generation_pipeline/step0_context
+
+goal: >
+  Provide detailed and structured context regarding the learner's prior experience, mastered concepts, and explicit goals, to inform downstream learning path generation.
+
+contents and subfolders:
+  kb:
+    Curated learner knowledge base, containing concise definitions and important concepts, frameworks, and technologies the learner is already familiar with (including data lakes, ETL/ELT, cloud services, data warehousing, streaming, DevOps, and big data tools).
+  learner_profile:
+      In-depth summary highlighting the learner's mastered skills, technical stack, data engineering practices, domain expertise (e.g., GDPR, ML operations), scale of experience, and certifications based on a comprehensive CV and experience record.
+  learning_goal:
+      Clear articulation of the learner's intended upskilling objective or transition (e.g., upskilling from batch to streaming, mastering Apache Flink w/ Java, SQL, Python, targeting Web3/Electricity Trading), as well as available time commitment and ideal job target.
+  source_codes:
+      Source codes of major learning target material, for example, If I want to learn streaming, I collect Apache Flink source code to here.

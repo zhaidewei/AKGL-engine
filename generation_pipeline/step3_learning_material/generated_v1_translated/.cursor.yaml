@@ -1,0 +1,18 @@
+current_folder: generation_pipeline/step3_learning_material/generated_vX
+
+goal: >
+  Contains Version X (integer starting from 1) of the generated learning material.
+
+contents and subfolders:
+  charpter_sector_name.md:
+    - Each markdown file should be focus on one learning point.
+    - Content Explaination using terms and concepts either that the learner already known (see step 0 KB and learner profile) or already explained in earlier material
+    - Make definition in accurate engineering language first, then use plain language and also analogy to explain
+    - Good to mention the relationship between current topic and already learned topics. This will help the learner to trunk a group of knowledge together.
+    - Make pseudocode of the topic if it is a class name or interface name or a function that you can find from the source code (see step0, source_codes)
+    - Give the reference to the source codes, if there is many places, choose the most important one. You can get the relative reference based on local folder, but add an URL link to Public Github repo,
+      Example, `generation_pipeline/step0_context/source_codes/flink/` is the local folder, but https://github.com/apache/flink/blob/release-2.2/ is the public URL head.
+    - Don't show legacy API, be strict on software versions, you can find the version from step 1 output project design. If not seen, be explicit about which version you choose to use.
+    - Give a Minimum Viable Code for the topic. You can assume the learner will run the code in local dev environment.
+    - Give common mistakes people make about the topic.
+    - Summary when the learner should think of this topic, it is a mind trigger

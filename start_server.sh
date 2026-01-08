@@ -11,5 +11,5 @@ fi
 PORT=${1:-8080}
 echo "启动服务器..."
 echo "访问 http://localhost:$PORT 查看学习路径"
-python3 server.py $PORT
+python3 serving/server.py $PORT
 

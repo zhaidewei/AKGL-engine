@@ -1,0 +1,30 @@
+current_folder: generation_pipeline/step1_output_project_design
+
+goal: >
+  At the end of this learning, the learner wants to build this project as a demo and test of learning.
+  Design it at the beginning to help chosen learning material and path.
+
+substeps:
+  - step 1.1 generare output design: >
+    Use step0 context generate file output_project_design_vx.md
+    OR Use review_report_vx.md and output_project_design_vx.md to generate version x+1
+  - step 1.2 review design:
+    For each version of output design, perform a review and write the opinion to review_report_v4.md
+
+contents and subfolders:
+  output_project_design_vx.md:
+    - Architect design of the final project.
+    - It should be a personal demo project also using enterprise best practise so can be an interview demo case.
+    - Should also have real value and use case.
+    - Youc can suggest a few to let the learner choose from.
+  review_report_vx.md:
+    - review feed back on a specific output_project_design version. Used to generate next version.
+    - review requirements:
+      - Complete Technical design
+      - Look for mistakes and out dated contents (you can search internet or use the source code )
+      - The project must have a real business value
+      - API/ Endpoints are not outdated, search internet if needed.
+      - Software versions should be pinned / mentioned.
+      - Operation Cost should be clear and not waste.
+      - Technical choice should be made, don't use A or B.
+      - Must splited into development steps

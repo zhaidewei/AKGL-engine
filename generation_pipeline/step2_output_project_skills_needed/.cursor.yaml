@@ -1,0 +1,24 @@
+current_folder: generation_pipeline/step2_output_project_skills_needed
+
+goal: >
+  Analysis the final project from step1 and get a list of knowledge points/ skills sets that the learner should have.
+  Note, use the latest version of output_project_design_vx.md
+
+substeps:
+  - 2.1 Generate knowledge_and_skills_needed_v1.md based on step1 output output_project_design_vN.md (use the latest version)
+  - 2.2 Review knowledge_and_skills_needed_vx.md and generate review_report_vx.md
+  - 2.3 If the review score is lower than 90, use knowledge_and_skills_needed_vx.md and review_report_vx.md to generate a new version v(x+1)
+        Only change points mentioned by the review doc, don't change others. and go to 2.2
+
+contents and subfolders:
+  knowledge_and_skills_needed_vx.md:
+    - List of keywords of knowledges that is needed for building this project.
+    - Think functional and operational.
+    - Apply 20/80 principle to choose.
+    - sequence of points matters, the learner should be able to go a linear learning path, so if point X is required for understanding point Y, X should be before Y
+    - Except knowledge in step0_context kb and learner_profile you must assume the learner doesn't know a term or concept.
+    - Don't be afraid too many learning points, learning point should be as atomic as possible
+  review_report_vx.md:
+    - Check if all requirements of knowledge_and_skills_needed_vx.md
+    - Give a score between 0 - 100
+    - Give clear review change opinion for each issue you see.

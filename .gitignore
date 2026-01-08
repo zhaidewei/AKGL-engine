@@ -10,3 +10,4 @@ deprecated/
 .DS_Store
 .idea/
 .vscode/
+generation_pipeline/step0_context/source_codes/

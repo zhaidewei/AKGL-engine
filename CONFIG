@@ -14,3 +14,11 @@ LEARNING_GOAL: input/this_is_what_I_want_to_learn.yaml
 # OUTPUT
 GENERATED_LEARNING_MATERIAL_FOLDER: output/
 AUDIT_REPORT: output/audit_report_reviewer.md
+
+# SERVER MODE
+# Set USE_OUTLINE_MODE to true to use outline markdown + generated_v1 content
+# Set to false to use traditional YAML + output folder
+USE_OUTLINE_MODE: true
+LEARNING_OUTLINE: generation_pipeline/step2_output_project_skills_needed/knowledge_and_skills_needed_v2.md
+GENERATED_CONTENT_DIR: generation_pipeline/step3_learning_material/generated_v1
+GENERATED_CONTENT_DIR_ZH: generation_pipeline/step3_learning_material/generated_v1_translated

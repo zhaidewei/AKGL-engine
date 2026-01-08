@@ -1,0 +1,26 @@
+current_folder: generation_pipeline/step3_learning_material
+
+goal: >
+  Follow the step2 knowledge_and_skills_needed_vN.md (take the latest version number N) and output list of learning material.
+  Although there is a
+
+substeps:
+  - 3.1 First generation: Use step2 outputs, generate a series of markdown files, each file covers one learning point from step2.
+  - 3.2 Perform review: against all files in generated_vX folder. Write an report of the review at review_report_vx.md give a score of each markdown file 0-100. If all scores are above 90, stop, else go to 3.3
+  - 3.3 Revise based on review: use the review report to update last version, only do changes mentioned in review report, and keep other unchanged. Generate new verison X+1 and go to 3.2 review step again.
+
+contents and subfolders:
+  generated_vX/:
+    - This is the versioned output folder, X represents an integer starting from 1
+    - It contains markdown files which follows the step2 knowledge_and_skills_needed_vN.md
+    - Learning material content should be low in cognitive load and a learner should be able to finish with in less than 10 min.
+      If one learning point in step2 contains much information that can't finish in 10 min, break it down to several markdown files.
+    - Follow other requirements mentioned at generated_vX/.cursor.yaml
+  review_report_vx.md:
+    - Review generated_VX files (whose previous score is below 90)
+    - Cover requirement mentioned at generated_vX/.cursor.yaml
+    - Look for mistakes
+    - Look for outdated content
+    - Look for content used before explained. (If used, must declare where this content is explained)
+    - Loof for over-complicated single file that can be splited into multiple
+    - Score is given against each markdown file (0-100)
