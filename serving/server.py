@@ -52,7 +52,10 @@ CONFIG = load_config()
 USE_OUTLINE_MODE = CONFIG.get('USE_OUTLINE_MODE', 'false').lower() == 'true'
 OUTLINE_FILE = BASE_DIR / CONFIG.get('LEARNING_OUTLINE', 'generation_pipeline/step2_output_project_skills_needed/knowledge_and_skills_needed_v2.md')
 GENERATED_CONTENT_DIR_EN = BASE_DIR / CONFIG.get('GENERATED_CONTENT_DIR', 'generation_pipeline/step3_learning_material/generated_v1')
-GENERATED_CONTENT_DIR_ZH = BASE_DIR / CONFIG.get('GENERATED_CONTENT_DIR_ZH', 'generation_pipeline/step3_learning_material/generated_v1_translated')
+GENERATED_CONTENT_DIR_ZH = BASE_DIR / CONFIG.get(
+    'GENERATED_CONTENT_DIR_ZH',
+    'generation_pipeline/step4_translate_to_Chinese/generated_v1'
+)
 
 YAML_FILE = BASE_DIR / CONFIG.get('LEARNING_GOAL', 'input/this_is_what_I_want_to_learn.yaml')
 OUTPUT_DIR = BASE_DIR / CONFIG.get('GENERATED_LEARNING_MATERIAL_FOLDER', 'output')
@@ -185,6 +188,28 @@ HOME_TEMPLATE = """
         .language-toggle:hover {
             background: var(--bg-hover);
             border-color: var(--link-color);
+        }
+
+        .reset-progress-button {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 8px 12px;
+            cursor: pointer;
+            color: var(--text-primary);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            text-decoration: none;
+        }
+
+        .reset-progress-button:hover {
+            background: var(--bg-hover);
+            border-color: #f85149;
+            color: #f85149;
         }
 
         .theme-toggle {
@@ -481,6 +506,10 @@ HOME_TEMPLATE = """
                 <a href="?lang={{ 'en' if current_lang == 'zh' else 'zh' }}" class="language-toggle" id="languageToggle">
                     <span id="languageText">{{ 'English' if current_lang == 'zh' else '中文' }}</span>
                 </a>
+                <button class="reset-progress-button" id="resetProgressButton" title="重置学习进度">
+                    <span>🔄</span>
+                    <span>重置进度</span>
+                </button>
                 <button class="theme-toggle" id="themeToggle" aria-label="切换主题">
                     <svg id="themeIcon" viewBox="0 0 16 16" width="16" height="16">
                         <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0ZM2 8a6 6 0 0 1 6-6v12a6 6 0 0 1-6-6Z"></path>
@@ -602,6 +631,19 @@ HOME_TEMPLATE = """
                     updateProgress();
                 });
             });
+
+            // 重置进度按钮
+            const resetProgressButton = document.getElementById('resetProgressButton');
+            if (resetProgressButton) {
+                resetProgressButton.addEventListener('click', function() {
+                    if (confirm('确定要重置所有学习进度吗？此操作无法撤销。')) {
+                        localStorage.removeItem('learningProgress');
+                        localStorage.removeItem('totalModules');
+                        // 重新加载页面以更新进度显示
+                        window.location.reload();
+                    }
+                });
+            }
         })();
     </script>
 </body>
@@ -1188,6 +1230,10 @@ MARKDOWN_TEMPLATE = """
                 <a href="/view/{{ module_id }}?lang={{ 'en' if current_lang == 'zh' else 'zh' }}" class="language-toggle" id="languageToggle">
                     <span id="languageText">{{ 'English' if current_lang == 'zh' else '中文' }}</span>
                 </a>
+                <button class="reset-progress-button" id="resetProgressButton" title="重置学习进度">
+                    <span>🔄</span>
+                    <span>重置进度</span>
+                </button>
                 <button class="theme-toggle" id="themeToggle" aria-label="切换主题">
                     <svg id="themeIcon" viewBox="0 0 16 16" width="16" height="16">
                         <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0ZM2 8a6 6 0 0 1 6-6v12a6 6 0 0 1-6-6Z"></path>
@@ -1328,6 +1374,21 @@ MARKDOWN_TEMPLATE = """
                 updateCompleteButton();
                 updateProgress();
             });
+
+            // 重置进度按钮（在详情页）
+            const resetProgressButton = document.getElementById('resetProgressButton');
+            if (resetProgressButton) {
+                resetProgressButton.addEventListener('click', function() {
+                    if (confirm('确定要重置所有学习进度吗？此操作无法撤销。')) {
+                        localStorage.removeItem('learningProgress');
+                        localStorage.removeItem('totalModules');
+                        // 返回主页并重新加载
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const lang = urlParams.get('lang') || 'en';
+                        window.location.href = '/?lang=' + lang;
+                    }
+                });
+            }
         })();
     </script>
 </body>

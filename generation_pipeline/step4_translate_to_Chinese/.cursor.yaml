@@ -1,0 +1,13 @@
+current_folder: generation_pipeline/step4_translate_to_Chinese
+
+goal: >
+  Step 3 content are written in English, I am Chinese, so translate to make me read faster.
+
+
+
+contents and subfolders:
+  generated_vX/:
+    - Contains translated markdown files.
+    - Use Chinese for most content, except for Terms (like Flink, Spark etc)
+  knowledge_and_skills_needed_vY.md:
+    - Translated from step2_output_project_skills_needed/knowledge_and_skills_needed_v2.md (pick the latest one)

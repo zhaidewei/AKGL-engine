@@ -1,0 +1,8 @@
+current_folder: generation_pipeline/step4_translate_to_Chinese/generated_vX
+
+goal: >
+  Contains translated Version X (integer starting from 1) of the generated learning material.
+
+contents and subfolders:
+  charpter_sector_name.md:
+    - translated from corresponding file at step3_learning_material/
