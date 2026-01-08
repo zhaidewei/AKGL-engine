@@ -6,7 +6,7 @@
 
 ---
 
-## Executive Summary
+## 执行摘要
 
 All 56 learning material files have been generated based on `knowledge_and_skills_needed_v2.md`. Each file covers one atomic learning point with comprehensive explanations, code examples, and project-specific context.
 
@@ -31,7 +31,7 @@ Each file is scored on:
 
 ---
 
-## File-by-File Review
+## 逐文件审查
 
 ### Section 1: Flink Fundamentals (1.1 - 1.10)
 
@@ -399,7 +399,7 @@ Each file is scored on:
 
 ---
 
-## Summary Statistics
+## 汇总统计
 
 ### Score Distribution
 - **90-100**: 54 files (96.4%)
@@ -430,7 +430,7 @@ Each file is scored on:
 
 ---
 
-## Recommendations for Step 3.3 (Revision)
+## 对 Step 3.3 的修改建议
 
 ### Priority 1: Minor Improvements (2 files)
 1. **14.1_flink_cep_complex_event_processing.md** (92/100)

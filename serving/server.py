@@ -50,8 +50,19 @@ CONFIG = load_config()
 # 1. 传统模式：使用 YAML 文件 + output 目录
 # 2. 新模式：使用 outline markdown + generated_v1 目录
 USE_OUTLINE_MODE = CONFIG.get('USE_OUTLINE_MODE', 'false').lower() == 'true'
-OUTLINE_FILE = BASE_DIR / CONFIG.get('LEARNING_OUTLINE', 'generation_pipeline/step2_output_project_skills_needed/knowledge_and_skills_needed_v2.md')
-GENERATED_CONTENT_DIR_EN = BASE_DIR / CONFIG.get('GENERATED_CONTENT_DIR', 'generation_pipeline/step3_learning_material/generated_v1')
+# 英文/中文两套大纲配置
+OUTLINE_FILE_EN = BASE_DIR / CONFIG.get(
+    'LEARNING_OUTLINE',
+    'generation_pipeline/step2_output_project_skills_needed/knowledge_and_skills_needed_v2.md'
+)
+OUTLINE_FILE_ZH = BASE_DIR / CONFIG.get(
+    'LEARNING_OUTLINE_ZH',
+    'generation_pipeline/step4_translate_to_Chinese/knowledge_and_skills_needed_v2.md'
+)
+GENERATED_CONTENT_DIR_EN = BASE_DIR / CONFIG.get(
+    'GENERATED_CONTENT_DIR',
+    'generation_pipeline/step3_learning_material/generated_v1'
+)
 GENERATED_CONTENT_DIR_ZH = BASE_DIR / CONFIG.get(
     'GENERATED_CONTENT_DIR_ZH',
     'generation_pipeline/step4_translate_to_Chinese/generated_v1'
@@ -82,6 +93,13 @@ def get_content_dir(language=None):
         return GENERATED_CONTENT_DIR_ZH if language == 'zh' else GENERATED_CONTENT_DIR_EN
     else:
         return OUTPUT_DIR
+
+
+def get_outline_file(language=None):
+    """根据语言获取大纲 markdown 路径"""
+    if language is None:
+        language = get_language()
+    return OUTLINE_FILE_ZH if language == 'zh' else OUTLINE_FILE_EN
 
 # 主页 HTML 模板
 HOME_TEMPLATE = """
@@ -1407,12 +1425,19 @@ def normalize_to_filename(section_num, title):
     return f"{section_num}_{normalized}"
 
 
-def parse_outline_markdown():
-    """解析 outline markdown 文件，构建学习路径结构"""
-    if not OUTLINE_FILE.exists():
-        raise FileNotFoundError(f"Outline file not found at {OUTLINE_FILE}")
+def parse_outline_markdown(outline_path=None):
+    """解析 outline markdown 文件，构建学习路径结构
 
-    with open(OUTLINE_FILE, 'r', encoding='utf-8') as f:
+    Args:
+        outline_path: 指定要解析的大纲文件路径（中文/英文）；为 None 时使用英文大纲
+    """
+    if outline_path is None:
+        outline_path = OUTLINE_FILE_EN
+
+    if not outline_path.exists():
+        raise FileNotFoundError(f"Outline file not found at {outline_path}")
+
+    with open(outline_path, 'r', encoding='utf-8') as f:
         content = f.read()
 
     lines = content.split('\n')
@@ -1608,7 +1633,9 @@ def index():
     language = get_language()
 
     if USE_OUTLINE_MODE:
-        learning_path, outline_sections = parse_outline_markdown()
+        # 根据语言选择对应大纲（英文 / 中文）
+        outline_file = get_outline_file(language)
+        learning_path, outline_sections = parse_outline_markdown(outline_file)
         sections = organize_modules_by_section(learning_path['modules'], outline_sections)
     else:
         data = load_yaml_data()
@@ -1652,8 +1679,9 @@ def view_markdown(module_id):
             else:
                 abort(404)
 
-        # 获取模块信息
-        learning_path, _ = parse_outline_markdown()
+        # 获取模块信息（使用当前语言对应的大纲，标题会用中/英文版本）
+        outline_file = get_outline_file(language)
+        learning_path, _ = parse_outline_markdown(outline_file)
         modules = learning_path['modules']
     else:
         # 传统模式：从 OUTPUT_DIR 读取

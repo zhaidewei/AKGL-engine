@@ -20,5 +20,6 @@ AUDIT_REPORT: output/audit_report_reviewer.md
 # Set to false to use traditional YAML + output folder
 USE_OUTLINE_MODE: true
 LEARNING_OUTLINE: generation_pipeline/step2_output_project_skills_needed/knowledge_and_skills_needed_v2.md
+LEARNING_OUTLINE_ZH: generation_pipeline/step4_translate_to_Chinese/knowledge_and_skills_needed_v2.md
 GENERATED_CONTENT_DIR: generation_pipeline/step3_learning_material/generated_v1
 GENERATED_CONTENT_DIR_ZH: generation_pipeline/step4_translate_to_Chinese/generated_v1
