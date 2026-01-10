@@ -101,6 +101,47 @@ def get_outline_file(language=None):
         language = get_language()
     return OUTLINE_FILE_ZH if language == 'zh' else OUTLINE_FILE_EN
 
+
+def get_translations(language=None):
+    """获取翻译字典"""
+    if language is None:
+        language = get_language()
+
+    if language == 'zh':
+        return {
+            'progress': '进度',
+            'reset_progress': '重置进度',
+            'reset_progress_title': '重置学习进度',
+            'reset_confirm': '确定要重置所有学习进度吗？此操作无法撤销。',
+            'light_theme': '浅色',
+            'dark_theme': '深色',
+            'back_to_index': '← 返回目录',
+            'prev_page': '上一页',
+            'next_page': '下一页',
+            'first_page': '已经是第一页',
+            'last_page': '已经是最后一页',
+            'mark_complete': '标记完成',
+            'completed': '已完成',
+            'toggle_theme': '切换主题'
+        }
+    else:
+        return {
+            'progress': 'Progress',
+            'reset_progress': 'Reset Progress',
+            'reset_progress_title': 'Reset Learning Progress',
+            'reset_confirm': 'Are you sure you want to reset all learning progress? This action cannot be undone.',
+            'light_theme': 'Light',
+            'dark_theme': 'Dark',
+            'back_to_index': '← Back to Index',
+            'prev_page': 'Previous',
+            'next_page': 'Next',
+            'first_page': 'Already at first page',
+            'last_page': 'Already at last page',
+            'mark_complete': 'Mark Complete',
+            'completed': 'Completed',
+            'toggle_theme': 'Toggle Theme'
+        }
+
 # 主页 HTML 模板
 HOME_TEMPLATE = """
 <!DOCTYPE html>
@@ -514,7 +555,7 @@ HOME_TEMPLATE = """
             <div class="header-actions">
                 <div class="progress-info">
                     <div>
-                        <span>进度:</span>
+                        <span>{{ translations.progress }}:</span>
                         <span class="progress-number" id="progressText">0/0</span>
                     </div>
                     <div class="progress-bar-container">
@@ -524,15 +565,15 @@ HOME_TEMPLATE = """
                 <a href="?lang={{ 'en' if current_lang == 'zh' else 'zh' }}" class="language-toggle" id="languageToggle">
                     <span id="languageText">{{ 'English' if current_lang == 'zh' else '中文' }}</span>
                 </a>
-                <button class="reset-progress-button" id="resetProgressButton" title="重置学习进度">
+                <button class="reset-progress-button" id="resetProgressButton" title="{{ translations.reset_progress_title }}">
                     <span>🔄</span>
-                    <span>重置进度</span>
+                    <span>{{ translations.reset_progress }}</span>
                 </button>
-                <button class="theme-toggle" id="themeToggle" aria-label="切换主题">
+                <button class="theme-toggle" id="themeToggle" aria-label="{{ translations.toggle_theme }}">
                     <svg id="themeIcon" viewBox="0 0 16 16" width="16" height="16">
                         <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0ZM2 8a6 6 0 0 1 6-6v12a6 6 0 0 1-6-6Z"></path>
                     </svg>
-                    <span id="themeText">浅色</span>
+                    <span id="themeText">{{ translations.light_theme }}</span>
                 </button>
             </div>
             <h1>{{ title }}</h1>
@@ -569,6 +610,13 @@ HOME_TEMPLATE = """
             const html = document.documentElement;
             const progressText = document.getElementById('progressText');
 
+            // 翻译文本
+            const translations = {
+                lightTheme: '{{ translations.light_theme }}',
+                darkTheme: '{{ translations.dark_theme }}',
+                resetConfirm: '{{ translations.reset_confirm }}'
+            };
+
             // 从 localStorage 读取主题偏好，默认为 dark
             const currentTheme = localStorage.getItem('theme') || 'dark';
             html.setAttribute('data-theme', currentTheme);
@@ -585,10 +633,10 @@ HOME_TEMPLATE = """
             function updateThemeIcon(theme) {
                 if (theme === 'dark') {
                     themeIcon.innerHTML = '<path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0ZM2 8a6 6 0 0 1 6-6v12a6 6 0 0 1-6-6Z"></path>';
-                    themeText.textContent = '浅色';
+                    themeText.textContent = translations.lightTheme;
                 } else {
                     themeIcon.innerHTML = '<path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0-1.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5ZM8 0a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0V.75A.75.75 0 0 1 8 0ZM8 13.5a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5A.75.75 0 0 1 8 13.5ZM2.343 2.343a.75.75 0 0 1 1.061 0l1.06 1.061a.75.75 0 0 1-1.06 1.06l-1.061-1.06a.75.75 0 0 1 0-1.061Zm9.193 9.193a.75.75 0 0 1 1.06 0l1.061 1.06a.75.75 0 0 1-1.06 1.061l-1.061-1.06a.75.75 0 0 1 0-1.061ZM0 8a.75.75 0 0 1 .75-.75h1.5a.75.75 0 0 1 0 1.5H.75A.75.75 0 0 1 0 8Zm13.5 0a.75.75 0 0 1 .75-.75h1.5a.75.75 0 0 1 0 1.5h-1.5A.75.75 0 0 1 13.5 8ZM2.343 13.657a.75.75 0 0 1 0-1.061l1.061-1.06a.75.75 0 0 1 1.06 1.06l-1.06 1.061a.75.75 0 0 1-1.061 0Zm9.193-9.193a.75.75 0 0 1 0-1.06l1.06-1.061a.75.75 0 1 1 1.061 1.06l-1.061 1.061a.75.75 0 0 1-1.06 0Z"></path>';
-                    themeText.textContent = '深色';
+                    themeText.textContent = translations.darkTheme;
                 }
             }
 
@@ -654,7 +702,7 @@ HOME_TEMPLATE = """
             const resetProgressButton = document.getElementById('resetProgressButton');
             if (resetProgressButton) {
                 resetProgressButton.addEventListener('click', function() {
-                    if (confirm('确定要重置所有学习进度吗？此操作无法撤销。')) {
+                    if (confirm(translations.resetConfirm)) {
                         localStorage.removeItem('learningProgress');
                         localStorage.removeItem('totalModules');
                         // 重新加载页面以更新进度显示
@@ -1112,6 +1160,67 @@ MARKDOWN_TEMPLATE = """
             transition: all 0.3s ease;
         }
 
+        /* 代码块复制按钮样式 */
+        .code-copy-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 6px 10px;
+            cursor: pointer;
+            color: var(--text-primary);
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            opacity: 0;
+            z-index: 10;
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        .markdown-body pre:hover .code-copy-button,
+        .highlight pre:hover .code-copy-button,
+        .code-copy-button:hover {
+            opacity: 1;
+        }
+
+        .code-copy-button:hover {
+            background: var(--bg-hover);
+            border-color: var(--link-color);
+            color: var(--link-color);
+        }
+
+        .code-copy-button:active {
+            transform: scale(0.95);
+        }
+
+        .code-copy-button.copied {
+            background: var(--button-bg);
+            border-color: var(--button-bg);
+            color: #ffffff;
+        }
+
+        [data-theme="dark"] .code-copy-button.copied {
+            background: #238636;
+            border-color: #238636;
+        }
+
+        [data-theme="light"] .code-copy-button.copied {
+            background: #2da44e;
+            border-color: #2da44e;
+        }
+
+        .code-copy-button svg {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
+        }
+
         /* 浅色模式下代码块使用更深的背景 */
         [data-theme="light"] .markdown-body pre {
             background: #f6f8fa;
@@ -1154,6 +1263,7 @@ MARKDOWN_TEMPLATE = """
             color: var(--text-primary);
             border: 1px solid var(--border-color);
             transition: all 0.3s ease;
+            position: relative;
         }
 
         /* Dark theme syntax colors */
@@ -1238,7 +1348,7 @@ MARKDOWN_TEMPLATE = """
             <div class="header-actions">
                 <div class="progress-info">
                     <div>
-                        <span>进度:</span>
+                        <span>{{ translations.progress }}:</span>
                         <span class="progress-number" id="progressText">0/0</span>
                     </div>
                     <div class="progress-bar-container">
@@ -1248,17 +1358,17 @@ MARKDOWN_TEMPLATE = """
                 <a href="/view/{{ module_id }}?lang={{ 'en' if current_lang == 'zh' else 'zh' }}" class="language-toggle" id="languageToggle">
                     <span id="languageText">{{ 'English' if current_lang == 'zh' else '中文' }}</span>
                 </a>
-                <button class="reset-progress-button" id="resetProgressButton" title="重置学习进度">
+                <button class="reset-progress-button" id="resetProgressButton" title="{{ translations.reset_progress_title }}">
                     <span>🔄</span>
-                    <span>重置进度</span>
+                    <span>{{ translations.reset_progress }}</span>
                 </button>
-                <button class="theme-toggle" id="themeToggle" aria-label="切换主题">
+                <button class="theme-toggle" id="themeToggle" aria-label="{{ translations.toggle_theme }}">
                     <svg id="themeIcon" viewBox="0 0 16 16" width="16" height="16">
                         <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0ZM2 8a6 6 0 0 1 6-6v12a6 6 0 0 1-6-6Z"></path>
                     </svg>
-                    <span id="themeText">浅色</span>
+                    <span id="themeText">{{ translations.light_theme }}</span>
                 </button>
-                <a href="/" class="back-link">← 返回目录</a>
+                <a href="/" class="back-link">{{ translations.back_to_index }}</a>
             </div>
         </div>
         <div class="markdown-body markdown-body">
@@ -1267,30 +1377,30 @@ MARKDOWN_TEMPLATE = """
             <div class="nav-buttons">
                 {% if prev_module %}
                 <a href="/view/{{ prev_module.id }}?lang={{ current_lang }}" class="nav-button prev">
-                    <span class="nav-button-label">上一页</span>
+                    <span class="nav-button-label">{{ translations.prev_page }}</span>
                     <span class="nav-button-title">← {{ prev_module.title }}</span>
                 </a>
                 {% else %}
                 <div class="nav-button prev disabled">
-                    <span class="nav-button-label">上一页</span>
-                    <span class="nav-button-title">← 已经是第一页</span>
+                    <span class="nav-button-label">{{ translations.prev_page }}</span>
+                    <span class="nav-button-title">← {{ translations.first_page }}</span>
                 </div>
                 {% endif %}
 
                 <button class="complete-button" id="completeButton" data-module-id="{{ module_id }}">
                     <span id="completeIcon">✓</span>
-                    <span id="completeText">标记完成</span>
+                    <span id="completeText">{{ translations.mark_complete }}</span>
                 </button>
 
                 {% if next_module %}
                 <a href="/view/{{ next_module.id }}?lang={{ current_lang }}" class="nav-button next">
                     <span class="nav-button-title">{{ next_module.title }} →</span>
-                    <span class="nav-button-label">下一页</span>
+                    <span class="nav-button-label">{{ translations.next_page }}</span>
                 </a>
                 {% else %}
                 <div class="nav-button next disabled">
-                    <span class="nav-button-title">已经是最后一页 →</span>
-                    <span class="nav-button-label">下一页</span>
+                    <span class="nav-button-title">{{ translations.last_page }} →</span>
+                    <span class="nav-button-label">{{ translations.next_page }}</span>
                 </div>
                 {% endif %}
             </div>
@@ -1305,8 +1415,27 @@ MARKDOWN_TEMPLATE = """
             const completeButton = document.getElementById('completeButton');
             const completeIcon = document.getElementById('completeIcon');
             const completeText = document.getElementById('completeText');
-            const moduleId = completeButton.dataset.moduleId;
             const progressText = document.getElementById('progressText');
+
+            // 翻译文本
+            const translations = {
+                lightTheme: '{{ translations.light_theme }}',
+                darkTheme: '{{ translations.dark_theme }}',
+                resetConfirm: '{{ translations.reset_confirm }}',
+                markComplete: '{{ translations.mark_complete }}',
+                completed: '{{ translations.completed }}'
+            };
+
+            // 确保按钮存在后再获取 moduleId
+            if (!completeButton) {
+                console.error('Complete button not found');
+                return;
+            }
+            const moduleId = completeButton.dataset.moduleId;
+            if (!moduleId) {
+                console.error('Module ID not found in button dataset:', completeButton);
+                return;
+            }
 
             // 从 localStorage 读取主题偏好，默认为 dark
             const currentTheme = localStorage.getItem('theme') || 'dark';
@@ -1324,10 +1453,10 @@ MARKDOWN_TEMPLATE = """
             function updateThemeIcon(theme) {
                 if (theme === 'dark') {
                     themeIcon.innerHTML = '<path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0ZM2 8a6 6 0 0 1 6-6v12a6 6 0 0 1-6-6Z"></path>';
-                    themeText.textContent = '浅色';
+                    themeText.textContent = translations.lightTheme;
                 } else {
                     themeIcon.innerHTML = '<path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0-1.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5ZM8 0a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0V.75A.75.75 0 0 1 8 0ZM8 13.5a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5A.75.75 0 0 1 8 13.5ZM2.343 2.343a.75.75 0 0 1 1.061 0l1.06 1.061a.75.75 0 0 1-1.06 1.06l-1.061-1.06a.75.75 0 0 1 0-1.061Zm9.193 9.193a.75.75 0 0 1 1.06 0l1.061 1.06a.75.75 0 0 1-1.06 1.061l-1.061-1.06a.75.75 0 0 1 0-1.061ZM0 8a.75.75 0 0 1 .75-.75h1.5a.75.75 0 0 1 0 1.5H.75A.75.75 0 0 1 0 8Zm13.5 0a.75.75 0 0 1 .75-.75h1.5a.75.75 0 0 1 0 1.5h-1.5A.75.75 0 0 1 13.5 8ZM2.343 13.657a.75.75 0 0 1 0-1.061l1.061-1.06a.75.75 0 0 1 1.06 1.06l-1.06 1.061a.75.75 0 0 1-1.061 0Zm9.193-9.193a.75.75 0 0 1 0-1.06l1.06-1.061a.75.75 0 1 1 1.061 1.06l-1.061 1.061a.75.75 0 0 1-1.06 0Z"></path>';
-                    themeText.textContent = '深色';
+                    themeText.textContent = translations.darkTheme;
                 }
             }
 
@@ -1342,17 +1471,18 @@ MARKDOWN_TEMPLATE = """
             }
 
             function updateCompleteButton() {
+                if (!completeButton || !moduleId) return;
                 const progress = getProgress();
                 const isCompleted = progress[moduleId] === true;
 
                 if (isCompleted) {
                     completeButton.classList.add('completed');
-                    completeIcon.textContent = '✓';
-                    completeText.textContent = '已完成';
+                    if (completeIcon) completeIcon.textContent = '✓';
+                    if (completeText) completeText.textContent = translations.completed;
                 } else {
                     completeButton.classList.remove('completed');
-                    completeIcon.textContent = '';
-                    completeText.textContent = '标记完成';
+                    if (completeIcon) completeIcon.textContent = '';
+                    if (completeText) completeText.textContent = translations.markComplete;
                 }
             }
 
@@ -1380,24 +1510,28 @@ MARKDOWN_TEMPLATE = """
             }
 
             // 初始化完成按钮状态和进度
-            updateCompleteButton();
+            if (completeButton && moduleId) {
+                updateCompleteButton();
+            }
             updateProgress();
 
             // 点击完成按钮
-            completeButton.addEventListener('click', function() {
-                const progress = getProgress();
-                const isCompleted = progress[moduleId] === true;
-                progress[moduleId] = !isCompleted;
-                saveProgress(progress);
-                updateCompleteButton();
-                updateProgress();
-            });
+            if (completeButton && moduleId) {
+                completeButton.addEventListener('click', function() {
+                    const progress = getProgress();
+                    const isCompleted = progress[moduleId] === true;
+                    progress[moduleId] = !isCompleted;
+                    saveProgress(progress);
+                    updateCompleteButton();
+                    updateProgress();
+                });
+            }
 
             // 重置进度按钮（在详情页）
             const resetProgressButton = document.getElementById('resetProgressButton');
             if (resetProgressButton) {
                 resetProgressButton.addEventListener('click', function() {
-                    if (confirm('确定要重置所有学习进度吗？此操作无法撤销。')) {
+                    if (confirm(translations.resetConfirm)) {
                         localStorage.removeItem('learningProgress');
                         localStorage.removeItem('totalModules');
                         // 返回主页并重新加载
@@ -1407,6 +1541,119 @@ MARKDOWN_TEMPLATE = """
                     }
                 });
             }
+
+            // 代码复制功能
+            function initCodeCopyButtons() {
+                // 查找所有代码块：pre 元素（包括 highlight pre 和 markdown-body pre）
+                const codeBlocks = document.querySelectorAll('pre');
+
+                codeBlocks.forEach((pre, index) => {
+                    // 跳过已经有复制按钮的代码块
+                    if (pre.querySelector('.code-copy-button')) {
+                        return;
+                    }
+
+                    // 获取代码内容
+                    const codeElement = pre.querySelector('code');
+                    if (!codeElement) return;
+
+                    // 创建复制按钮
+                    const copyButton = document.createElement('button');
+                    copyButton.className = 'code-copy-button';
+                    copyButton.setAttribute('aria-label', 'Copy code');
+                    copyButton.innerHTML = `
+                        <svg viewBox="0 0 16 16" width="14" height="14">
+                            <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path>
+                            <path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"></path>
+                        </svg>
+                        <span class="copy-text">Copy</span>
+                    `;
+
+                    // 复制功能
+                    copyButton.addEventListener('click', async function(e) {
+                        e.stopPropagation();
+
+                        // 获取代码文本
+                        let codeText = '';
+                        if (codeElement) {
+                            // 如果代码块有多个子元素（语法高亮），需要提取所有文本
+                            codeText = codeElement.innerText || codeElement.textContent || '';
+                        } else {
+                            codeText = pre.innerText || pre.textContent || '';
+                        }
+
+                        try {
+                            // 使用 Clipboard API
+                            await navigator.clipboard.writeText(codeText);
+
+                            // 更新按钮状态
+                            const copyText = copyButton.querySelector('.copy-text');
+                            const originalText = copyText ? copyText.textContent : 'Copy';
+
+                            copyButton.classList.add('copied');
+                            if (copyText) copyText.textContent = 'Copied!';
+
+                            // 2秒后恢复
+                            setTimeout(() => {
+                                copyButton.classList.remove('copied');
+                                if (copyText) copyText.textContent = originalText;
+                            }, 2000);
+                        } catch (err) {
+                            // 降级方案：使用传统方法
+                            const textArea = document.createElement('textarea');
+                            textArea.value = codeText;
+                            textArea.style.position = 'fixed';
+                            textArea.style.opacity = '0';
+                            document.body.appendChild(textArea);
+                            textArea.select();
+
+                            try {
+                                document.execCommand('copy');
+                                const copyText = copyButton.querySelector('.copy-text');
+                                const originalText = copyText ? copyText.textContent : 'Copy';
+
+                                copyButton.classList.add('copied');
+                                if (copyText) copyText.textContent = 'Copied!';
+
+                                setTimeout(() => {
+                                    copyButton.classList.remove('copied');
+                                    if (copyText) copyText.textContent = originalText;
+                                }, 2000);
+                            } catch (err) {
+                                console.error('Failed to copy code:', err);
+                            } finally {
+                                document.body.removeChild(textArea);
+                            }
+                        }
+                    });
+
+                    // 将按钮添加到代码块
+                    pre.style.position = 'relative';
+                    pre.appendChild(copyButton);
+                });
+            }
+
+            // 初始化复制按钮
+            initCodeCopyButtons();
+
+            // 如果页面内容动态加载，可以监听 DOM 变化
+            const observer = new MutationObserver(function(mutations) {
+                let shouldReinit = false;
+                mutations.forEach(function(mutation) {
+                    if (mutation.addedNodes.length > 0) {
+                        shouldReinit = true;
+                    }
+                });
+                if (shouldReinit) {
+                    initCodeCopyButtons();
+                }
+            });
+
+            // 开始观察
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
         })();
     </script>
 </body>
@@ -1642,13 +1889,17 @@ def index():
         learning_path = data['learning_path']
         sections = organize_modules_by_section(learning_path['modules'])
 
+    # 获取翻译
+    translations = get_translations(language)
+
     # 创建响应并设置cookie
     response = make_response(render_template_string(
         HOME_TEMPLATE,
         title=learning_path['title'],
         description=learning_path['description'],
         sections=sections,
-        current_lang=language
+        current_lang=language,
+        translations=translations
     ))
     response.set_cookie('language', language, max_age=31536000)  # 1年
     return response
@@ -1733,6 +1984,9 @@ def view_markdown(module_id):
                 next_module = modules[i + 1]
             break
 
+    # 获取翻译
+    translations = get_translations(language)
+
     # 创建响应并设置cookie
     response = make_response(render_template_string(
         MARKDOWN_TEMPLATE,
@@ -1741,7 +1995,8 @@ def view_markdown(module_id):
         module_id=module_id,
         prev_module=prev_module,
         next_module=next_module,
-        current_lang=language
+        current_lang=language,
+        translations=translations
     ))
     response.set_cookie('language', language, max_age=31536000)  # 1年
     return response

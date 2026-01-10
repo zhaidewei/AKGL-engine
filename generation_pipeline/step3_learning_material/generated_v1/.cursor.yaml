@@ -10,9 +10,20 @@ contents and subfolders:
     - Make definition in accurate engineering language first, then use plain language and also analogy to explain
     - Good to mention the relationship between current topic and already learned topics. This will help the learner to trunk a group of knowledge together.
     - Make pseudocode of the topic if it is a class name or interface name or a function that you can find from the source code (see step0, source_codes)
-    - Give the reference to the source codes, if there is many places, choose the most important one. You can get the relative reference based on local folder, but add an URL link to Public Github repo,
-      Example, `generation_pipeline/step0_context/source_codes/flink/` is the local folder, but https://github.com/apache/flink/blob/release-2.2/ is the public URL head.
+    - : >
+      Show the reference to the source codes, if there is many places, choose the most important one.
+      You can get the relative reference based on local folder, but add an URL link to Public Github repo,
+      Although you use the local source code mostly while generaing code, do display the corresponding Github URL link so learner can click at it.
+      Local path to Github path mapping is
+      generation_pipeline/step0_context/source_codes/flink/ -> https://github.com/apache/flink/blob/release-2.2/
+      For Example
+      The local reference you found is `generation_pipeline/step0_context/source_codes/flink/flink-runtime/src/main/java/org/apache/flink/runtime/jobmaster/JobManagerRunner.java`
+      But in markdown file, show this at the source code reference part
+      ```markdown
+      [flink-runtime/src/main/java/org/apache/flink/runtime/jobmaster/JobManagerRunner.java](https://github.com/apache/flink/blob/release-2.2/flink-runtime/src/main/java/org/apache/flink/runtime/jobmaster/JobManagerRunner.java)
+      ````
     - Don't show legacy API, be strict on software versions, you can find the version from step 1 output project design. If not seen, be explicit about which version you choose to use.
     - Give a Minimum Viable Code for the topic. You can assume the learner will run the code in local dev environment.
     - Give common mistakes people make about the topic.
     - Summary when the learner should think of this topic, it is a mind trigger
+    -
